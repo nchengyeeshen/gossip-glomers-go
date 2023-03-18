@@ -13,6 +13,8 @@ func main() {
 	n.Handle("generate", func(msg maelstrom.Message) error {
 		return n.Reply(msg, map[string]any{
 			"type": "generate_ok",
+			// UUIDs have low chance of collisions and don't rely on any state
+			// for generating new IDs, making it ideal for this use-case.
 			"id":   uuid.NewString(),
 		})
 	})

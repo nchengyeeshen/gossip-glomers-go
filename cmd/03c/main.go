@@ -55,6 +55,8 @@ func (s *Server) BroadcastHandler(msg maelstrom.Message) error {
 		return err
 	}
 
+	// Check for the presence of a message ID. Node.Send expects no reply, so
+	// message ID is not included.
 	if body.ID != 0 {
 		s.node.Reply(msg, map[string]any{
 			"type": "broadcast_ok",
@@ -118,6 +120,7 @@ func (s *Server) broadcastToNeighbours(msg int) {
 					},
 				)
 
+				// Linear backoff.
 				time.Sleep(time.Duration(i) * 100 * time.Millisecond)
 			}
 

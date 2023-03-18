@@ -54,6 +54,8 @@ func (s *Server) BroadcastHandler(msg maelstrom.Message) error {
 		return err
 	}
 
+	// Check for the presence of a message ID. Node.Send expects no reply, so
+	// message ID is not included.
 	if body.ID != 0 {
 		s.node.Reply(msg, map[string]any{
 			"type": "broadcast_ok",
@@ -96,10 +98,13 @@ func (s *Server) TopologyHandler(msg maelstrom.Message) error {
 func (s *Server) broadcastToNeighbours(msg int) {
 	for _, neighbour := range s.neighbours(s.node.ID()) {
 		go func(dest string) {
-			s.node.Send(dest, map[string]any{
-				"type":    "broadcast",
-				"message": msg,
-			})
+			s.node.Send(
+				dest,
+				map[string]any{
+					"type":    "broadcast",
+					"message": msg,
+				},
+			)
 		}(neighbour)
 	}
 }
